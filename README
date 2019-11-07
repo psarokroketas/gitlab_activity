@@ -1,0 +1,51 @@
+This project goes in gitlab and gives a KPI with all the commits that happened per Functional Element
+
+
+-> Every top hostgroup lvl does not have the same Functional Element as its children so we had to do a lot of puppetdb querys
+   to get each hostgroup's F.E.
+
+
+--Documentation--
+
+
+get_ammount_of_commits :
+    The projects get an argument on how many hours you want it to look but.
+    For example : ./gitlab_activity 1  = gets the activity for the last hour
+
+    Here gets the commits that happened in gitlab 
+
+
+
+parse_arguments : 
+   Creating the argument for the hours that was mentioned above
+
+
+projects_generator:
+   gets the full project: node , environmetn, name etc
+
+gitlab_paginated_request:
+   pagination divides large list of items in pages. This is what we are also doing right now for the projects
+
+
+def send(document)
+   sends the KPI to the monitoring's infrustractor endpoint 
+
+
+def main()
+   ->gets the ammount with the hours there
+   ->the project name goes like this 'it-cm-lcs' and we are getting only the last part witch is the hostgroup name
+   -> we are doing a puppetdb query to get top-level-hostgroup's name 
+   -> Every child of the top level hostgroup does not have the same functional element. This is why for every top level hostgroup we are 
+      doing on more puppetdb query for all the children nodes of the top lvl hostgroup
+      to get the Functional Element of every node
+   -> we are having a list of dictionaries and we are creating a new one with keys the Functional Element and as Value to commits that happened
+   -> creating a KPI and sending it to the endpoint that was mentioned earlier
+
+
+This project had the problem of doing way to many puppetdb querys ( over 40.000 ).We decided to get the functional element of the top level hostgroup only
+That needed a limit to the querys so it could stop at the first node that it would find
+This connected me to another project that i should fix that bug on the puppetdb client , creating room for more parameters
+
+So this would allow us to have as hostgroup endpoint = /pdb/query/v4/facts/hostgroup?limit=0&offset=0 (offset not needed at this project)
+
+
